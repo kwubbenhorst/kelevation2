@@ -1,3 +1,4 @@
+console.log("Script 1 loaded");
 document.addEventListener("DOMContentLoaded", function() {
     //Karla's apiKey stored in a variable, and a variable dishName created to capture user input from the input box on the search page.  It is just set to "Maple Glazed Salmon" as a default for now so I can test this code. Button element created in search.html and stored in a variable here so I can listen for clicks on it 
   var apiKeySpnclr = "0d496145a03e4cdfb825d930b3633556";
@@ -8,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function() {
    
   
   function renderSearchResults(allRecipeDetails) {
+    console.log('Rendering search results:', allRecipeDetails);
     function updateAccordionItem(accordionItem, recipeDetails, index) {
       var accordionButton = accordionItem.querySelector('.accordion-button');
       accordionButton.innerHTML = '<span class="star">&#9733;</span> Recipe Result #' + (index + 1) + ' <span class="star">&#9733;</span>';
@@ -66,26 +68,25 @@ document.addEventListener("DOMContentLoaded", function() {
     // A fetch URL to get recipes from spoonacular api. Query parameters are hardcoded to limit recipes returned to 5, to sort by most popular and display them in descending order. Data will include full recipe instructions and nutritional info
     var recipesURL = `https://api.spoonacular.com/recipes/complexSearch?query=${dishName}&addRecipeNutrition=true&instructionsRequired=true&sort=popularity&sortDirection=desc&number=5&apiKey=${apiKeySpnclr}`;
    
-    //Send a fetch request to get recipes.
-    fetch(recipesURL)
-      .then(function (response) {
-        return response.json();
-      })
+    // Return the fetch promise. Send a fetch request to get recipes
+  return fetch(recipesURL)
+  .then(function (response) {
+    return response.json();
+  })
   //Here the then block is opened where we do all the manipulation we want to do of the returned data. 
   //In the big picture we want to build two arrays from which data can easily be rendered. 
   //The allReturnedRecipes array is an array of objects, one for each recipe.  We will use this to render the recipe cards on p3.  The returnedRecipeObject will be used to structure the data. When populated with actual data from the returned recipes these objects will be pushed into the allReturnedRecipes array one at a time
   //The allRecipeDetails array is an array of objects, one for each recipe's detailed information. We will use this to render the recipe search result list on p.2. The recipeDetailsObject will be used to structure the data. When populated with actual data from the returned recipes these objects will be pushed into the allRecipeDetails array one at a time   
-      .then(function (data) { 
-        if (data.results && data.results.length > 0) {
-          console.log(data.results); //Checks that indeed some data has been returned and logs it all out in the console
-  
-  //Declares the recipe and recipeDetails variables and sets them initially to an empty array. Eventually I will push as many iterations of the returnedRecipeObject and the recipeDetailsObject in here as are returned from the fetch request
-          var allReturnedRecipes = [];
-          var allRecipeDetails = [];
-          for (var i = 0; i < data.results.length; i++) {
-            var recipeData = data.results[i]; //lets me deal with each returned recipe's data separately
-          
-  
+  .then(function (data) { 
+    if (data.results && data.results.length > 0) {
+      console.log(data.results); //Checks that indeed some data has been returned and logs it all out in the console
+
+//Declares the recipe and recipeDetails variables and sets them initially to an empty array. Eventually I will push as many iterations of the returnedRecipeObject and the recipeDetailsObject in here as are returned from the fetch request
+      var allReturnedRecipes = [];
+      var allRecipeDetails = [];
+      for (var i = 0; i < data.results.length; i++) {
+        var recipeData = data.results[i]; //lets me deal with each returned recipe's data separately.then(function (data) {
+    
   // Extracts the ingredients values and formats them.
   var ingredientsVal = [];
     for (var j = 0; j < recipeData.nutrition.ingredients.length; j++) {
@@ -178,7 +179,11 @@ document.addEventListener("DOMContentLoaded", function() {
   
         }
       })
-  };
+      .catch(function (error) {
+        console.error('Error fetching recipes:', error);
+      });
+  }
+  
   console.log('before adding event listener');
   //console.log(searchBtn1El);
   console.log(searchBtn2El);
@@ -186,14 +191,28 @@ document.addEventListener("DOMContentLoaded", function() {
   //Added an event listener to the search button on search.html to call the getRecipes function on click
   //searchBtn1El.addEventListener("click", function() {
     //console.log('Button 1 clicked');
-    //getRecipes;
+    //getRecipes();
     //console.log('After getRecipes function call');
     ////window.location.href = '../library/menus.html';
   //});
   console.log('after adding event listener');
-  searchBtn2El.addEventListener("click", function() {
+  console.log ('before element selection');
+  
+  if (searchBtn2El) {
+    console.log('after element selection, searchBtn2El:', searchBtn2El);
+  
+    searchBtn2El.addEventListener("click", function() {
     console.log('Button 2 clicked');
-    getRecipes;
-    window.location.href = "../library/results.html";
+    // Call getRecipes and use then to handle the completion before navigating
+  getRecipes().then(function() {
+    // Delay the page replacement for 5 seconds (5000 milliseconds) for testing
+    setTimeout(function() {
+      window.location.href = "../library/results.html";
+    }, 20000); // Adjust the delay as needed
   });
+    console.log('After element selection, searchBtn2El:', searchBtn2El);
+  });
+} else {
+  console.log('Element with class "btn-menus-page" not found in the current page.');
+}
   });
