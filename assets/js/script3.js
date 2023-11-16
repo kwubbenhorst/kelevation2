@@ -1,18 +1,95 @@
 //Karla's apiKey stored in a variable, and a variable dishName created to capture user input from the input box on the search page.  It is just set to "Maple Glazed Salmon" as a default for now so I can test this code. Button element created in search.html and stored in a variable here so I can listen for clicks on it 
-var apiKeySpnclr = "0d496145a03e4cdfb825d930b3633556";
-var apiKeyYelpFusn = "KFt9d65AEUW43oYGLpjKF8-Es3373cifbRG8ihm2cxtd5NtzffOoVrW0977HpELtSHQXIx2O5X5wTDuc1Z-QINlrJ5oVC0Okif7YEiYEvPNgJgY4FoQvYRb6aelNZXYx";
-var dishName = "saffron";
-var searchBtnEl = document.getElementById("search-btn");
-var recipeBtnEl = document.getElementById("recipe-btn");
- 
-
-function renderSearchResults(allRecipeDetails) {
-    
+var apiKeySpnclr = "8fd577ed42a246f5ae57136ccaf8d0f7";
+var ingredientOrDishName;
+var searchBtnEl = document.getElementById("button-addon2");
+var input = document.querySelector(".input-1");
+var accordionHeaderEls = document.querySelectorAll(".accordion-header");
+var accordionBodyEls = document.querySelectorAll('.accordion-body');
+//const recipeCardContainer = document.getElementById('recipe-container');  Added by Patrick for getRecipeCard
 
 
+function renderRecipeDetails(allRecipeDetails) {
+    console.log("Rendering recipe details");
+    //wrapping this function in a promise so its asynchronous activity has a chance to complete before the program moves on
+    return new Promise(function (resolve, reject) { 
+        setTimeout(function () {
+            console.log('renderingRecipeData');
+
+    // Iterate through each accordion section
+    for (var i = 0; i < accordionHeaderEls.length; i++) {
+      var accordionHeaderEl = accordionHeaderEls[i];
+      var accordionBodyEl = accordionBodyEls[i];
+  
+      // Check if there is a corresponding recipe detail
+      if (i < allRecipeDetails.length) {
+        var recipeDetail = allRecipeDetails[i];
+  
+        // Populate accordion header with the title
+        accordionHeaderEl.querySelector('button').textContent = 'Recipe Result #' + (i + 1) + ': ' + recipeDetail.title;
+  
+        // Generate content for accordion body
+        var content = '<strong>Likes:</strong> ' + recipeDetail.aggregateLikes;
+        content += '<br><strong>Economical:</strong> ';
+
+        if (recipeDetail.cheap) {
+        content += '<span style="color: green;">&#10003;</span>';
+        } else {
+        content += 'No';
+        }
+
+        content += '<br><strong>Healthy:</strong> ';
+
+        if (recipeDetail.veryHealthy) {
+        content += '<span style="color: green;">&#10003;</span>';
+        } else {
+        content += 'Not so much';
+        }
+  
+        // Add cuisine information if available
+        if (recipeDetail.cuisines.length > 0) {
+          content += '<br><strong>Cuisine:</strong> ' + recipeDetail.cuisines.join(', ');
+        }
+  
+        // Add portion-size information if available
+        if (recipeDetail.weightPerServing.length > 0) {
+          content += '<br><strong>Portion-size:</strong> ' + recipeDetail.weightPerServing;
+        }
+
+        // Add nutritional info
+        content += '<br><strong>Nutritional info per portion:</strong> ' + recipeDetail.nutritionalInfo;
+  
+        // Add diets information
+        content += '<br><strong>Suitable for:</strong> ' + recipeDetail.diets.join(', ');
+  
+  
+        // Set the innerHTML of the accordion body with the generated content
+        accordionBodyEl.innerHTML = '<pre>' + content + '</pre>';
+      } else {
+        // If there's no corresponding recipe detail, clear the accordion title and body
+        accordionHeaderEl.querySelector('button').textContent = '';
+        accordionBodyEl.innerHTML = '';
+  
+        // Set button visibility to hidden
+        accordionBodyEl.querySelector('.get').style.visibility = 'hidden';
+      }
+    }
+  
+    // Set button visibility to visible for all accordion sections
+    var buttons = document.querySelectorAll('.get');
+    for (var n = 0; n < buttons.length; n++) {
+      buttons[n].style.visibility = 'visible';
+    }
+
+    // Resolve the promise when rendering is complete
+    resolve();
+    }, 100); // Adjust the delay as needed
+    console.log("Recipe details rendered successfully");
+    });
 
 }
-//Nick takes over coding from here.  I have done the pseudocode
+
+/*
+//Patrick takes over coding from here.  I have done the pseudocode
 function renderRecipeCards(allReturnedRecipes) {
 
     //Iterate through the recipes array of objects so that recipes[i] lets you access each recipe individually
@@ -21,12 +98,69 @@ function renderRecipeCards(allReturnedRecipes) {
     //In the second .then block log the response (should be an http URL which can be used as a src for rendering)
     //Use createElement and appendChild to dynamically create the card elements and push data.url to them as the image src. You will want to do a document.location.replace so that results.html is now your document
     //Do a catch method for handling any errors in the fetch request
+
+    //Patrick's Code
+function renderRecipeCards(recipes) {
+const apiUrl = `https://api.spoonacular.com/recipes/${recipes.id}/information?apiKey=${apiKeySpnclr}`;
+fetch(apiUrl)
+.then(response => response.json())
+.then(data =>
+  {
+    if (data) {
+      const recipeCardHTML = `
+      <div class="recipe-card">
+          <h2>${data.title}</h2>
+          <ul>
+              ${data.extendedIngredients.map(ingredient => `<li>${ingredient.original}</li>`).join('')}
+          </ul>
+          <p>${data.instructions || 'No instructions available.'}</p>
+      </div>
+  `
+  recipeCardContainer.innerHTML = recipeCardHTML;
+
+    }
+    else{
+      recipeCardContainer.textContent = 'Recipe not found.';
     }
 
+  })
+  .catch(error =>{
+    console.error('Error fetching recipe details',error);
+  });
+
+
+
+
+    }
+
+    //function to do the fetch request to Spoonacular for menu items (Dan's code)
+function getMenuItems() {
+
+
+
+
+
+
+
+
+
+}
+*/
+
+
+
+
+
+
     //Function to getRecipes that will be called as an event handler function when submit button is hit on search page
-function getRecipes() { 
+function getRecipes() {
+    //wrapping this function with asynchronous activity in a promise to give it a chance to complete its work before the program moves on 
+    return new Promise(function (resolve, reject) {
+    ingredientOrDishName = input.value;
+    //Check that the input has been captured
+    console.log('Ingredient or Dish Name:', ingredientOrDishName);
   // A fetch URL to get recipes from spoonacular api. Query parameters are hardcoded to limit recipes returned to 5, to sort by most popular and display them in descending order. Data will include full recipe instructions and nutritional info
-  var recipesURL = `https://api.spoonacular.com/recipes/complexSearch?query=${dishName}&addRecipeNutrition=true&instructionsRequired=true&sort=popularity&sortDirection=desc&number=5&apiKey=${apiKeySpnclr}`;
+  var recipesURL = `https://api.spoonacular.com/recipes/complexSearch?query=${ingredientOrDishName}&addRecipeNutrition=true&instructionsRequired=true&sort=popularity&sortDirection=desc&number=5&apiKey=${apiKeySpnclr}`;
  
   //Send a fetch request to get recipes.
   fetch(recipesURL)
@@ -37,7 +171,8 @@ function getRecipes() {
 //In the big picture we want to build two arrays from which data can easily be rendered. 
 //The allReturnedRecipes array is an array of objects, one for each recipe.  We will use this to render the recipe cards on p3.  The returnedRecipeObject will be used to structure the data. When populated with actual data from the returned recipes these objects will be pushed into the allReturnedRecipes array one at a time
 //The allRecipeDetails array is an array of objects, one for each recipe's detailed information. We will use this to render the recipe search result list on p.2. The recipeDetailsObject will be used to structure the data. When populated with actual data from the returned recipes these objects will be pushed into the allRecipeDetails array one at a time   
-    .then(function (data) { 
+    .then(function (data) {
+        console.log('Data received successfully:', data); 
       if (data.results && data.results.length > 0) {
         console.log(data.results); //Checks that indeed some data has been returned and logs it all out in the console
 
@@ -45,6 +180,7 @@ function getRecipes() {
         var allReturnedRecipes = [];
         var allRecipeDetails = [];
         for (var i = 0; i < data.results.length; i++) {
+            console.log('Rendering details for recipe:', i);
           var recipeData = data.results[i]; //lets me deal with each returned recipe's data separately
         
 
@@ -133,16 +269,146 @@ allRecipeDetails.push(recipeDetailsObject);
 console.log('Recipe details added:', allRecipeDetails);
 }
 
-//Call the function which will render the search results on page 2 (results.html) 
-    renderSearchResults(allRecipeDetails);
-     
-
-
-      }
-    })
+//Call the function which will render the recipeDetails into the accordion on page 2 (results2.html) 
+    renderRecipeDetails(allRecipeDetails)
+    .then(function () {
+        console.log('renderRecipeDetails completed successfully.');
+        resolve(allRecipeDetails); // Resolve with recipe details
+      })
+      .catch(function (error) {
+        console.error('Error in renderRecipeDetails', error);
+        reject(error);
+      });
+  }
+})
+.catch(function (error) {
+  reject(error);
+});
+});
 };
 
-//Added an event listener to the search button on search.html to call the getRecipes function on click
-searchBtnEl.addEventListener("click", getRecipes);
+/* DAN'S CODE
+// Function to getMenuItems
+function getMenuItems() {
+    var menuItemsURL = `https://api.spoonacular.com/food/menuItems/search?query=${dishName}&apiKey=${apiKeySpnclr}`;
+    return new Promise(function(resolve, reject) {
+      // Dan's code
+      console.log("hello")
+      fetch(menuItemsURL)
+      .then(function (response) {
+        return response.json();
+      })
+      
+      .then(function (data) { 
+        var returnedResults = data;
+                console.log(returnedResults);
+        console.log("Restaurant Chain:")
+        for (let i = 0; i < returnedResults.menuItems.length; i++) {
+          console.log(i, returnedResults.menuItems[i].restaurantChain)         
+        }
+  
+        console.log("Menu Item Names:")
+        for (let i = 0; i < returnedResults.menuItems.length; i++) {
+          console.log(i, returnedResults.menuItems[i].title)
+        }
+  
+        console.log("Images:")
+        for (let i = 0; i < returnedResults.menuItems.length; i++) {
+          console.log(i, returnedResults.menuItems[i].image)
+        }
+  
+        // iterate over results and list serving sizes info with i as the array placement
+        console.log("Serving size:")
+        for (let i = 0; i < returnedResults.menuItems.length; i++) {
+          console.log(i, returnedResults.menuItems[i].servings, returnedResults.menuItems[i].unit)
+        }
+      })
+  
+      // Assuming there's a promise here... (yes, Dan's fetch request)
+      someAsyncOperation()
+        .then(function(result) {
+          resolve(result);
+        })
+        .catch(function(error) {
+          console.error('Error getting menu items:', error);
+          reject(error);
+        });
+    });
+  }
+  */
+  
+  // DOM ready function
+  function domReady(fn) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fn);
+    } else {
+      fn();
+    }
+  }
 
-recipeBtnEl.addEventListener("click", renderRecipeCards);
+// DOM ready function
+domReady(function () {
+    console.log('DOM is ready.');
+    // Attach click event listener after the DOM is loaded
+    document.addEventListener('click', function (event) {
+        console.log('Click event triggered.');
+        // Check if the clicked element is a common element on both pages
+        var commonElement = event.target.closest('.common-element-class');
+
+        if (commonElement) {
+            event.preventDefault();
+            if (commonElement.id === 'button-addon2') {
+                // Handle the click as if it's the search button
+                console.log('Search button clicked.');
+
+
+                // Use Promise.all to wait for getRecipes to complete
+                getRecipes()
+                .then(function (allRecipeDetails) {
+                    console.log('getRecipes completed successfully:', allRecipeDetails);
+
+                    // Add a delay before swapping out search.html to results2.html
+                    setTimeout(function () {
+                        // Call renderRecipeDetails to render recipe details
+                        renderRecipeDetails(allRecipeDetails)
+                            .then(function () {
+                                console.log('renderRecipeDetails completed successfully.');
+                                // Now redirect to results2.html
+                                window.location.href = 'results2.html';
+                            })
+                            .catch(function (error) {
+                                console.error('Error in renderRecipeDetails', error);
+                            });
+                    }, 0); // No delay
+                })
+                .catch(function (error) {
+                    console.error('Error in getRecipes:', error);
+                });
+        }
+    }
+});
+});
+
+
+
+/*  replace lines 272 to 295 (DOMready function) with this once Dan's code is integrated 
+  
+  // Use DOMContentLoaded event
+  domReady(function() {
+    // Attach click event listener after the DOM is loaded
+    searchBtnEl.addEventListener('click', function(event) {
+      event.preventDefault();
+  
+      // Use Promise.all to wait for both getRecipes and getMenuItems to complete
+      Promise.all([getRecipes(), getMenuItems()])
+        .then(function() {
+          // Swap out search.html and load results2.html after both asynchronous operations are complete
+          window.location.href = 'results2.html';
+        })
+        .catch(function(error) {
+          console.error('Error:', error);
+        });
+    });
+  });
+
+  */
