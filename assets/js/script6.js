@@ -447,18 +447,40 @@ domReady(function () {
 
   */
 
+  
+// Add click event listener to each heart button
+heartButtons.forEach(function (button) {
+    button.addEventListener('click', handleFavoriteClick);
+  });
+  
+  function handleFavoriteClick(event) {
+    // Identify the clicked heart button
+    var clickedButton = event.target;
+  
+    // Access relevant information, e.g., recipe title, ID
+    var recipeTitle = clickedButton.parentElement.querySelector('h5').textContent;
+    // var recipeId = /* Get the recipe ID from your data structure or DOM */
+  
+    // Check if the item is already a favorite
+    var favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+  
+    var isFavorite = favorites.some(function (fav) {
+      return fav.id === recipeId;
+    });
+  
+    // Toggle the favorite status
+    if (isFavorite) {
+      // Remove from favorites
+      favorites = favorites.filter(function (fav) {
+        return fav.id !== recipeId;
+      });
+    } else {
+      // Add to favorites
+      favorites.push({ id: recipeId, title: recipeTitle });
+    }
+  
+    // Save the updated favorites to local storage
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  }
 
-  /* code for what happens when there's a click on "See Favourites" button p. 1
-var seeFavesButton2 = document.getElementById("see-faves-2");
-  seeFavesButton1.addEventListener("click", function () {
-            window.location.href = '/library/favourites2.html';
-        }; 
-
-  //code for what happens when there's a click on "See" Favourites button p. 2  
-    var seeFavesButton1 = document.getElementById("see-faves-1");
-        seeFavesButton1.addEventListener("click", function () {
-            window.location.href = '/library/favourites2.html';
-        });
-    
-*/
-
+  
