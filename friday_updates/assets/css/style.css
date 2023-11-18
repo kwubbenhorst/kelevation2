@@ -122,9 +122,7 @@ border-color: var(--light-basil);
 }
 
 .card {
-  margin: 20px 0px;
-  padding: 0px;
-  background-color: #EFEFEF;
+  margin-top: 20px;
 }
 
 
@@ -166,8 +164,7 @@ margin-left: 10%;
 color: var(--lemon); 
 font-size: 60px;
 text-align: center;
-margin-top: 20px;
-position: absolute;
+margin-top: 100px;
 }
 
 .overview-blurb {
@@ -321,4 +318,3 @@ background-color: var(--lemon);
 .source {
 
 }
-
