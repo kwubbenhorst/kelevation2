@@ -6,9 +6,9 @@ var allRecipeDetails = JSON.parse(localStorage.getItem("recipeinfo"));
 var allReturnedRecipes = JSON.parse(localStorage.getItem("recipes"));
 //var recipeCardContainer = document.querySelector('.recipe-card-container');
 
-function renderRecipeCard(recipeId) {
+function renderRecipeCard(recipeObject) {
   var selectedRecipe = allReturnedRecipes.find(function (recipe) {
-    return recipe.id === recipeId || recipe.title === recipeId; // Adjust based on your needs
+    return recipe.id === recipeObject.id || recipe.title === recipeObject.title; 
   });
   // Check if the recipe is found
   if (selectedRecipe) {
