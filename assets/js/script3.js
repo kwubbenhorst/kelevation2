@@ -137,26 +137,18 @@ fetch(apiUrl)
 function getMenuItems() {
 
 
-
-
-
-
-
-
-
-}
 */
-
-
-
-
-
 
     //Function to getRecipes that will be called as an event handler function when submit button is hit on search page
 function getRecipes() {
     //wrapping this function with asynchronous activity in a promise to give it a chance to complete its work before the program moves on 
     return new Promise(function (resolve, reject) {
     ingredientOrDishName = input.value;
+    // Set the input value in local storage so I will still have access to it on p. 2 of
+    localStorage.setItem('ingredientOrDishName', ingredientOrDishName);
+
+    // Check that the input has been captured
+    console.log('Ingredient or Dish Name:', ingredientOrDishName);
     //Check that the input has been captured
     console.log('Ingredient or Dish Name:', ingredientOrDishName);
   // A fetch URL to get recipes from spoonacular api. Query parameters are hardcoded to limit recipes returned to 5, to sort by most popular and display them in descending order. Data will include full recipe instructions and nutritional info
@@ -289,20 +281,9 @@ console.log('Recipe details added:', allRecipeDetails);
 localStorage.setItem("recipeinfo", JSON.stringify(allRecipeDetails));
 }
 
-
-
 //Call the function which will render the recipeDetails into the accordion on page 2 (results2.html) 
     renderRecipeDetails(allRecipeDetails)
-    /*
-    .then(function () {
-        console.log('renderRecipeDetails completed successfully.');
-        resolve(allRecipeDetails); // Resolve with recipe details
-      })
-      .catch(function (error) {
-        console.error('Error in renderRecipeDetails', error);
-        reject(error);
-      });
-      */
+    
   } else {
   
   // Show the modal
@@ -383,7 +364,18 @@ domReady(function () {
     console.log('DOM is ready.');
     // Attach click event listener after the DOM is loaded
     document.addEventListener('click', function (event) {
-        console.log('Click event triggered.');
+      console.log('Click event triggered.');
+
+      // Check if the clicked element is the see-faves-1 button
+      if (event.target.id === 'see-faves-1') {
+          event.preventDefault();
+
+          // Handle the click for see-faves-1 button
+          console.log('See Faves button clicked.');
+
+          // Redirect to the favorites page
+          window.location.href = '../library/favourites.html';
+      } else {
         // Check if the clicked element is a common element on both pages
         var commonElement = event.target.closest('.common-element-class');
 
@@ -399,8 +391,8 @@ domReady(function () {
                 .then(function (allRecipeDetails) {
                     console.log('getRecipes completed successfully:', allRecipeDetails);
 
-                    // Add a delay before swapping out search.html to results2.html
-                    setTimeout(function () {
+                    /*// Add a delay before swapping out search.html to results2.html
+                    setTimeout(function () {*/
                         // Call renderRecipeDetails to render recipe details
                         renderRecipeDetails(allRecipeDetails)
                             /*.then(function () {
@@ -413,14 +405,14 @@ domReady(function () {
                             });
                             */
                             window.location.href = '/library/results2.html';
-                    }, 0); // No delay
+                    /*}, 0); // No delay*/
                 })
                 .catch(function (error) {
                     console.error('Error in getRecipes:', error);
                 });
         }
     }
-});
+}});
 });
 
 
@@ -446,19 +438,15 @@ domReady(function () {
   });
 
   */
-
-
-  /* code for what happens when there's a click on "See Favourites" button p. 1
-var seeFavesButton2 = document.getElementById("see-faves-2");
+/* 
+  //code for what happens when there's a click on "See Favourites" button p. 1  
+  var seeFavesButton1 = document.getElementById("see-faves-1");
   seeFavesButton1.addEventListener("click", function () {
-            window.location.href = '/library/favourites2.html';
-        }; 
+      window.location.href = '/library/favourites2.html';
+  });
 
-  //code for what happens when there's a click on "See" Favourites button p. 2  
-    var seeFavesButton1 = document.getElementById("see-faves-1");
-        seeFavesButton1.addEventListener("click", function () {
-            window.location.href = '/library/favourites2.html';
-        });
+  
+
+
     
 */
-

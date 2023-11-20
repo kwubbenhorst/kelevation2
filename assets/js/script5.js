@@ -1,237 +1,114 @@
-var allReturnedRecipes = JSON.parse(localStorage.getItem("recipes"));
-console.log(allRecipeDetails);
+// Calculate the index for the colour in the gradientColours array
+  document.addEventListener("DOMContentLoaded", function() {
+  console.log("DOM is ready.");
 
-/*
-// Attach click event listener to the accordion container
-document.querySelector('.accordion').addEventListener('click', function (event) {
-  // Check if the clicked element has the class 'get'
-  if (event.target.classList.contains('get')) {
-    // Access the recipe id using the dataset property
-    var recipeId = event.target.dataset.recipeId;
-    console.log('Recipe ID:', recipeId);
+  // Call seeFaves after the DOM is loaded
+  seeFaves();
 
-    // Call the function to render the selected recipe
-    renderSelectedRecipe(recipeId);
-
-    // Hide the accordion
-    var accordionContainer = document.querySelector('.accordion');
-    accordionContainer.style.display = 'none';
+// Function to reset the faves array in local storage to an empty array
+function clearAllFaves() {
+  localStorage.setItem("faves", JSON.stringify([]));
+    // Hide the favourites lists
+    document.querySelector(".favourites-list-1").style.display = "none";
+    document.querySelector(".favourites-list-2").style.display = "none";
+    // Show the carousel and credits
+    document.querySelector(".carousel-container").style.display = "block";
+    document.querySelector(".credits").style.display = "block";
+    console.log('Faves in local storage after clear-all:', JSON.parse(localStorage.getItem('faves')));
   }
-});
-*/
 
-function renderRecipeCard(recipeId) {
-  // Find the recipe details from the allReturnedRecipes array based on the recipeId
+function handleItemClick(itemElement, title) {
+  // Remove the item from the UI
+  itemElement.remove();
+  
+  // Remove the item from the array of favorites in local storage
+  var faves = JSON.parse(localStorage.getItem("faves")) || [];
+  var updatedFaves = faves.filter(function (item) {
+    return item.title !== title;
+  });
+  
+  localStorage.setItem("faves", JSON.stringify(updatedFaves));
 
-  // Show the recipe card container
-  var recipeCardContainer = document.querySelector('.recipe-card-container');
-  recipeCardContainer.style.display = 'block';
+  // Log the updated faves array
+  console.log('Updated faves array:', updatedFaves);
 }
-}
+  
 
-/*
-// Add click listener to the "Get" button when creating it dynamically
-getButton.addEventListener('click', function() {
-// Access the recipe id using the dataset property
-var recipeId = this.dataset.recipeId;
-console.log('Recipe ID:', recipeId);
+//FUNCTION SEE FAVES --------------------------------------------------------------
+  // called either from a click on see-faves-1 or see-faves-2.  This function is responsible for dynamically generating the 
+  // favourites list items, which content it retrieves from localStorage.
+  function seeFaves() {
+    var faves = JSON.parse(localStorage.getItem("faves")) || []; // Retrieve favourites from local storage or the empty array if they have only just been initialized
+    var length = faves.length;
+    var lengthOfFavouritesListEl1 = Math.floor(length / 2); // Round down to the nearest whole number
+    var lengthOfFavouritesListEl2 = lengthOfFavouritesListEl1 + (length % 2); // If length is odd, add 1 to the second list
 
-// Call the function to render the selected recipe
-renderSelectedRecipe(recipeId);
+    var favouritesListEl1 = document.querySelector(".favourites-list-1");
+    var favouritesListEl2 = document.querySelector(".favourites-list-2");
 
-// Hide the accordion
-var accordionContainer = document.querySelector('.accordion-container');
-accordionContainer.style.display = 'none';
-});
+    console.log("Length of faves:", faves.length);
+    console.log("Length of favouritesListEl1:", lengthOfFavouritesListEl1);
+    console.log("Length of favouritesListEl2:", lengthOfFavouritesListEl2);
+  
+    // In case this function gets called when there is content from a previous rendering of the favourites List, the function begins by clearing this out so that there is room for a new dynamic generation of the list group.
+    favouritesListEl1.innerHTML = "";
+    favouritesListEl2.innerHTML = "";
+    
+    // Array of colors for the gradient (I want to give my individual list items these bg colors)
+    var gradientColours = ["#336C41", "#407D26", "#4C8E2B", "#589F30", "#5F8C17"];
 
-
-
-function renderRecipeCard(recipeId) {
-// Find the recipe details from the allReturnedRecipes array based on the recipeId
-var selectedRecipe = allReturnedRecipes.find(function (recipe) {
-  return recipe.id === recipeId;
-});
-
-
-// Iterate through each returned recipe
-allReturnedRecipes.forEach(function (recipe) {
-  // Check if the current recipe matches the requested recipeId
-  if (recipe.id === recipeId) {
-    // Access the existing elements in the recipe card
-    var recipeTitleEl = document.querySelector('.recipe-title');
-    var servesAndTimeEl = document.querySelector('.serves-and-time');
-    var dishImageEl = document.querySelector('.dish-image');
-    var ingredientsListEl = document.querySelector('.ingredients-list');
-    var methodStepsListEl = document.querySelector('.method-steps-list');
-    var sourceLinkEl = document.querySelector('.source-link');function renderRecipeCard(recipeId) {
-
-  //Iterate through each returned recipe
-allReturnedRecipes.forEach(function(recipe) {
-  // Create a div for the recipe card
-  var recipeCard = document.createElement('div');
-  recipeCard.className = 'recipe-card';
-
-  // Set the title
-  var titleElement = document.createElement('h1');
-  titleElement.className = 'recipe-title';
-  titleElement.innerHTML = '<strong>' + recipe.title + '</strong>';
-  recipeCard.appendChild(titleElement);
-
-  // Add a heart button
-  var heartButton = document.createElement('button');
-  heartButton.className = 'heart-btn';
-  heartButton.textContent = '❤️';
-  recipeCard.appendChild(heartButton);
-
-  // Display serves and time
-  var servesAndTimeElement = document.createElement('h2');
-  servesAndTimeElement.className = 'serves-and-time';
-  servesAndTimeElement.textContent = 'Serves: ' + recipe.servings + ', Ready in: ' + recipe.readyInMinutes + ' minutes';
-  recipeCard.appendChild(servesAndTimeElement);
-
-  // Display the dish image
-  var dishImage = document.createElement('img');
-  dishImage.className = 'dish-image';
-  dishImage.src = recipe.image;
-  recipeCard.appendChild(dishImage);
-
-  // Display Ingredients
-  var ingredientsHeader = document.createElement('h2');
-  ingredientsHeader.innerHTML = '<strong>Ingredients:</strong>';
-  recipeCard.appendChild(ingredientsHeader);
-
-  var ingredientsList = document.createElement('ul');
-  ingredientsList.className = 'ingredients-list';
-
-  recipe.ingredients.forEach(function(ingredient) {
-    var ingredientItem = document.createElement('li');
-    ingredientItem.textContent = ingredient;
-    ingredientsList.appendChild(ingredientItem);
-  });
-
-  recipeCard.appendChild(ingredientsList);
-
-  // Display Method
-  var methodHeader = document.createElement('h2');
-  methodHeader.innerHTML = '<strong>Method:</strong>';
-  recipeCard.appendChild(methodHeader);
-
-  var methodStepsList = document.createElement('ul');
-  methodStepsList.className = 'method-steps-list';
-
-  recipe.steps.forEach(function(step) {
-    var stepItem = document.createElement('li');
-    stepItem.textContent = step;
-    methodStepsList.appendChild(stepItem);
-  });
-
-  recipeCard.appendChild(methodStepsList);
-
-  // Display Source
-  var sourceElement = document.createElement('h3');
-  sourceElement.className = 'source';
-  var sourceLink = document.createElement('a');
-  sourceLink.className = 'source-link';
-  sourceLink.href = recipe.sourceUrl;
-  sourceLink.textContent = 'Source';
-  sourceElement.appendChild(sourceLink);
-  recipeCard.appendChild(sourceElement);
-
-  // Append the recipe card to the container
-  recipeCardContainer.appendChild(recipeCard);
-});
-
-  // Find the recipe details from the allReturnedRecipes array based on the recipeId
-var selectedRecipe = allReturnedRecipes.find(function(recipe) {
-return recipe.id === recipeId;
-});
-
-
-// Check if the recipe is found
-if (selectedRecipe) {
-    // Access the elements in the recipe card
-    var recipeTitleEl = document.querySelector('.recipe-title');
-    var servesAndTimeEl = document.querySelector('.serves-and-time');
-    var dishImageEl = document.querySelector('.dish-image');
-    var ingredientsListEl = document.querySelector('.ingredients-list');
-    var methodStepsListEl = document.querySelector('.method-steps-list');
-    var sourceLinkEl = document.querySelector('.source-link');
-
-    // Update the content of the recipe card
-    recipeTitleEl.innerHTML = '<strong>' + selectedRecipe.title + '</strong>';
-    servesAndTimeEl.textContent = 'Serves: ' + selectedRecipe.servings + ' | Ready in: ' + selectedRecipe.readyInMinutes + ' minutes';
-    dishImageEl.src = selectedRecipe.image;
-    // Update Ingredients List
-    ingredientsListEl.innerHTML = ''; // Clear existing content
-    selectedRecipe.ingredients.forEach(function(ingredient) {
-    var ingredientItem = document.createElement('li');
-    ingredientItem.textContent = ingredient;
-    ingredientsListEl.appendChild(ingredientItem);
-  });
-
-  // Update Method Steps List
-    methodStepsListEl.innerHTML = ''; // Clear existing content
-    selectedRecipe.steps.forEach(function(step) {
-    var stepItem = document.createElement('li');
-    stepItem.textContent = step;
-    methodStepsListEl.appendChild(stepItem);
-  });
-
-  // Update Source Link
-    sourceLinkEl.href = selectedRecipe.sourceUrl;
-    sourceLinkEl.textContent = 'Source: ' + selectedRecipe.sourceUrl;
-
-
-   // Show the recipe card container
-    recipeCardContainer.style.display = 'block';
-}   
-};
-
-*/
-function renderRecipeDetails(allRecipeDetails) {
-  console.log("Rendering recipe details");
-
-  // Set button visibility to hidden
-        //accordionBodyEl.querySelector('.get').style.visibility = 'hidden';
+    function createListItem(title, container, index, totalItems) {
+      var listItem = document.createElement("li");
+    
+      // Create a div for the custom symbol
+      var customSymbol = document.createElement("div");
+      customSymbol.className = "custom-symbol";
+      customSymbol.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+        </svg>
+        <span>${title}</span>
+      `;
+    
+      // Calculate the index for the color in the gradientColours array
+      var colourIndex = Math.floor((index / (totalItems - 1)) * (gradientColours.length - 1));
+    
+      // Apply styling to the list item
+      listItem.style.backgroundColor = gradientColours[colourIndex];
+    
+      // Attach a click event listener to the custom symbol and use it to call the handleItemClick function
+      customSymbol.addEventListener("click", function () {
+        handleItemClick(listItem, title);
+      });
+      
+    
+      listItem.appendChild(customSymbol);
+      container.appendChild(listItem);
     }
-})();
-}
-/*
-// Set button visibility to visible for all accordion sections
-var buttons = document.querySelectorAll('.get');
-for (var n = 0; n < buttons.length; n++) {
-  buttons[n].style.visibility = 'visible';
-}
-*/
+    
+    // Clear the previous content of the lists
+    favouritesListEl1.innerHTML = "";
+    favouritesListEl2.innerHTML = "";
+    
+    for (var p = 0; p < lengthOfFavouritesListEl1; p++) {
+      var aGroupOneFavourite = faves[p];
+      createListItem(aGroupOneFavourite.title, favouritesListEl1, p, lengthOfFavouritesListEl1);
+    }
+    
+    for (var q = lengthOfFavouritesListEl1; q < length; q++) {
+      var aGroupTwoFavourite = faves[q];
+      createListItem(aGroupTwoFavourite.title, favouritesListEl2, q - lengthOfFavouritesListEl1, length - lengthOfFavouritesListEl1);
+    }
 
-// Resolve the promise when rendering is complete
-resolve();
-}, 100); 
+    // Event listeners
+  document.getElementById("back-to-search-2").addEventListener("click", function () {
+    window.location.href = "../library/search.html";
+  });
 
-/*
-// ...
+  //Clear-all button click handler, replaces the lists with the carousel and credits.
+  document.getElementById("clear-all-faves-btn").addEventListener("click", clearAllFaves);
+}});
 
-// Create and append the "Get" button dynamically
-var getButton = document.createElement('button');
-getButton.type = 'button';
-getButton.className = 'btn btn-primary get';
-getButton.textContent = 'Get';
-
-// Capture the recipe id
-getButton.dataset.recipeId = recipeDetail.id;  // Assuming the property is named 'id'
-
-// Add click listener to the "Get" button
-getButton.addEventListener('click', function() {
-  // Access the recipe id using the dataset property
-  var recipeId = this.dataset.recipeId;
-  console.log('Recipe ID:', recipeId);
-
-  // Add your logic to handle the click event, such as fetching additional details or navigating to a new page
-});
-
-// Append the "Get" button after the pre element
-accordionBodyEl.appendChild(getButton);
-
-// ...
-*/
-
+   
